@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Matche{% endblock %}
+
+{% block body %}
+    <h1>Create new Matche</h1>
+
+    {{ include('matche/_form.html.twig') }}
+
+    <a href="{{ path('app_matche_index') }}">back to list</a>
+{% endblock %}

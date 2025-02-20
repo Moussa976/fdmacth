@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Feuille de Match</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				font-size: 10px;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 20px;
+			}
+			th,
+			td {
+				border: 1px solid black;
+				padding: 5px;
+				text-align: center;
+			}
+			th {
+				background-color: #2fa4e7;
+				color: white;
+			}
+			.signature-box {
+				margin-top: 20px;
+				border: 1px solid black;
+				padding: 5px;
+				text-align: left;
+			}
+			.before-after-box {
+				border-top: 1px solid black;
+			}
+			.vertical-text {
+				writing-mode: vertical-rl;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="text-align: center; margin-bottom: 10px;">
+			<img src="C:/wamp64/www/fdm/gestion_fm/public/images/ascm-logo.png" alt="Logo de l’association" style="width:100; height:auto;">
+		</div>
+		<h2>Feuille de Match :
+			{{ matche.equipe1.nom }}
+			vs
+			{{ matche.equipe2.nom }}</h2>
+		<p>Date :
+			{{ matche.ladate|date('d/m/Y H:i') }}</p>
+		<p>Statut :
+			{{ matche.statut }}</p>
+
+            <p>{{ matche.getScoreEquipe1 }}
+							-
+							{{ matche.getScoreEquipe2 }}</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th colspan="6">Nom de l’équipe recevant :
+						{{ matche.equipe1.nom }}</th>
+					<th style="background-color:black;"></th>
+					<th colspan="6">Nom de l’équipe visiteur :
+						{{ matche.equipe2.nom }}</th>
+				</tr>
+				<tr>
+					<th>N°</th>
+					<th>Expulsé</th>
+					<th>Avertis</th>
+					<th>Blessé</th>
+					<th>Remplacé</th>
+					<th>Motifs / Buts</th>
+					<th style="background-color:black;"></th>
+					<th>N°</th>
+					<th>Expulsé</th>
+					<th>Avertis</th>
+					<th>Blessé</th>
+					<th>Remplacé</th>
+					<th>Motifs / Buts</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% set maxLignes = 11 %}
+				{% set joueursEquipe1 = [] %}
+				{% for joueurId in matche.feuilleMatch.titulairesEquipe1 %}
+					{% set joueursEquipe1 = joueursEquipe1|merge([joueurs[joueurId]]) %}
+				{% endfor %}
+				{% set joueursEquipe2 = [] %}
+				{% for joueurId in matche.feuilleMatch.titulairesEquipe2 %}
+					{% set joueursEquipe2 = joueursEquipe2|merge([joueurs[joueurId]]) %}
+				{% endfor %}
+
+				{% for i in 0..(maxLignes - 1) %}
+					<tr>
+						{# Équipe 1 #}
+						{% if joueursEquipe1[i] is defined %}
+							<td>{{ joueursEquipe1[i].nom }}</td>
+							<td>
+								{% for carton in matche.cartons %}
+									{% if carton.joueur.id == joueursEquipe1[i].id and carton.couleur == 'rouge' %}
+										X
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>
+								{% for carton in matche.cartons %}
+									{% if carton.joueur.id == joueursEquipe1[i].id and carton.couleur == 'jaune' %}
+										X
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td></td>
+							<!-- Blessé -->
+							<td>
+								{% for remplacement in matche.remplacements %}
+									{% if remplacement.joueurSortant.id == joueursEquipe1[i].id %}
+										{{ remplacement.minute }}'
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>
+								{% for but in matche.buts %}
+									{% if but.joueur.id == joueursEquipe1[i].id %}
+										{{ but.minute }}' ({{ but.type }})
+									{% endif %}
+								{% endfor %}
+							</td>
+						{% else %}
+							<td colspan="6"></td>
+						{% endif %}
+						<td style="background-color:black;"></td>
+						{# Équipe 2 #}
+						{% if joueursEquipe2[i] is defined %}
+							<td>{{ joueursEquipe2[i].numero }}</td>
+							<td>
+								{% for carton in matche.cartons %}
+									{% if carton.joueur.id == joueursEquipe2[i].id and carton.couleur == 'rouge' %}
+										X
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>
+								{% for carton in matche.cartons %}
+									{% if carton.joueur.id == joueursEquipe2[i].id and carton.couleur == 'jaune' %}
+										X
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td></td>
+							<!-- Blessé -->
+							<td>
+								{% for remplacement in matche.remplacements %}
+									{% if remplacement.joueurSortant.id == joueursEquipe2[i].id %}
+										{{ remplacement.minute }}'
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>
+								{% for but in matche.buts %}
+									{% if but.joueur.id == joueursEquipe2[i].id %}
+										{{ but.minute }}' ({{ but.type }})
+									{% endif %}
+								{% endfor %}
+							</td>
+						{% else %}
+							<td colspan="6"></td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		<table>
+			<tr>
+				<td rowspan="5" class="vertical-text">BANC RECEVANT</td>
+				<td rowspan="5"></td>
+				<td rowspan="5" class="signature-box">Nom, Prénom du capitaine ou dirigeant responsable :<br><br>Signature : ..............................................</td>
+				<td rowspan="2">Avant match</td>
+				<td rowspan="2">Après match</td>
+			</tr>
+			<tr></tr>
+			<tr>
+				<td rowspan="3" class="vertical-text">BANC VISITEUR</td>
+				<td rowspan="3"></td>
+			</tr>
+		</table>
+
+	</body>
+</html>

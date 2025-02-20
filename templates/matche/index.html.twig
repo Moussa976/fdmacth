@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Matche index
+{% endblock %}
+
+{% block body %}
+	<h1>Matche index</h1>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Ladate</th>
+				<th>Type</th>
+				<th>Statut</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for matche in matches %}
+				<tr>
+					<td>{{ matche.id }}</td>
+					<td>{{ matche.ladate ? matche.ladate|date('Y-m-d H:i:s') : '' }}</td>
+					<td>{{ matche.type }}</td>
+					<td>
+						{% if matche.statut == 'terminé' %}
+							Score :
+							{{ matche.getScoreEquipe1 }}
+							-
+							{{ matche.getScoreEquipe2 }}
+						{% elseif matche.ladate <= date() %}
+							<span class="badge bg-warning">En cours</span>
+						{% else %}
+							<span class="badge bg-info">À venir</span>
+						{% endif %}
+					</td>
+					<td>
+						<a href="{{ path('app_matche_show', {'id': matche.id}) }}">show</a>
+						<a href="{{ path('app_matche_edit', {'id': matche.id}) }}">edit</a>
+						<a href="{{ path('feuille_match_remplir', {'id': matche.id}) }}" class="btn btn-sm btn-primary">Remplir la feuille</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="5">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<a href="{{ path('app_matche_new') }}">Create new</a>
+{% endblock %}
